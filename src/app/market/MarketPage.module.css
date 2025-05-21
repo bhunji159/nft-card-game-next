@@ -1,0 +1,227 @@
+.market-container {
+	padding: 32px;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.section-title {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 24px;
+	text-align: center;
+}
+
+/* 카드 리스트 */
+.card-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	justify-content: center;
+}
+
+.market-card-wrapper {
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 16px;
+	width: 200px;
+	text-align: center;
+	background-color: white;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+	transition: all 0.2s ease-in-out;
+}
+.market-card-wrapper:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 카드 이미지 */
+.card-image-wrapper {
+	width: 100%;
+	height: 200px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.card-image {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
+/* 카드 정보 */
+.card-title {
+	color: black;
+	font-weight: bold;
+	font-size: 18px;
+	margin: 8px 0 0 0;
+}
+
+.card-rarity {
+	font-size: 14px;
+	color: #666;
+	margin: 4px 0 0 0;
+}
+
+.card-price {
+	margin-top: 8px;
+	font-size: 14px;
+	color: #444;
+}
+
+/* 버튼 */
+.buy-button {
+	margin-top: 10px;
+	padding: 8px 16px;
+	font-size: 14px;
+	background-color: #2d6cdf;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+.buy-button:hover {
+	background-color: #1e4fb5;
+}
+
+.register-button {
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	padding: 10px 16px;
+	background-color: #2d6cdf;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+/* 모달 */
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.modal-content {
+	background: white;
+	padding: 24px;
+	border-radius: 10px;
+	width: 360px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	text-align: center;
+}
+
+.modal-content button {
+	margin-top: 20px;
+	padding: 8px 16px;
+	background-color: #999;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.2s ease;
+}
+.modal-content button:hover {
+	background-color: #777;
+}
+
+/* 카드 등록 모달 내부 */
+.register-modal {
+	margin-top: 16px;
+}
+
+.register-modal h3 {
+	font-size: 16px;
+	margin-bottom: 8px;
+}
+
+.register-modal input {
+	width: 100%;
+	padding: 8px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	font-size: 14px;
+	box-sizing: border-box;
+}
+
+.register-modal button {
+	width: 100%;
+	padding: 10px;
+	background-color: #0070f3;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: bold;
+	transition: background-color 0.2s ease;
+}
+.register-modal button:hover {
+	background-color: #005bd1;
+}
+
+/* 소유 카드 리스트 */
+.owned-card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.owned-card-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: #f2f2f2;
+	padding: 10px 14px;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.rarity-badge {
+	background-color: #ddd;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+/* 정렬 및 필터 */
+.market-sort-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 20px;
+	justify-content: center;
+}
+.market-sort-controls input,
+.market-sort-controls select {
+	padding: 8px 12px;
+	font-size: 14px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+}
+
+/* 지갑 */
+.wallet-balance {
+	font-size: 14px;
+	font-weight: bold;
+	align-self: center;
+	margin-right: 8px;
+}

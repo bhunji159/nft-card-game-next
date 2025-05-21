@@ -1,0 +1,94 @@
+.viewerContainer {
+	padding: 32px;
+}
+
+.sectionTitle {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 24px;
+}
+
+.cardList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+}
+
+.buttonWrapper {
+	margin-top: 24px;
+	text-align: center;
+}
+
+.navigateButton {
+	padding: 10px 20px;
+	font-size: 16px;
+	background-color: #2d6cdf;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.navigateButton:hover {
+	background-color: #1e4fb5;
+}
+
+.filterControls {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 20px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.filterControls input,
+.filterControls select {
+	padding: 8px 12px;
+	font-size: 14px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+}
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.modalContent {
+	background-color: white;
+	padding: 24px;
+	border-radius: 10px;
+	max-width: 400px;
+	width: 90%;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	text-align: center;
+}
+
+.modalContent img {
+	max-width: 100%;
+	height: auto;
+	margin-bottom: 12px;
+}
+
+.modalContent button {
+	margin-top: 16px;
+	padding: 8px 16px;
+	background-color: #2d6cdf;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.modalContent button:hover {
+	background-color: #1e4fb5;
+}

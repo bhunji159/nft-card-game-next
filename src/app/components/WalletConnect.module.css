@@ -1,0 +1,27 @@
+.wallet-box {
+	text-align: right;
+	padding: 16px;
+	box-sizing: border-box;
+}
+
+.wallet-button {
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	background-color: #2d6cdf;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.1s ease;
+	outline: none;
+}
+
+.wallet-button:hover {
+	background-color: #1e4fb5;
+	transform: translateY(-2px);
+}
+
+.wallet-button:active {
+	transform: scale(0.98);
+}
