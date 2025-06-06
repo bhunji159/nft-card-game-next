@@ -9,7 +9,7 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     mapping(uint256 => uint256) public totalMinted; // id -> 발행된 수량
     mapping(address => mapping(uint256 => uint256)) public prices; // 소유자 주소 -> (id -> 가격)
 
-    uint256 public constant MAX_SUPPLY_PER_TYPE = 10;
+    uint256 public constant MAX_SUPPLY_PER_TYPE = 20;
 
     event PriceSet(address indexed seller, uint256 indexed typeId, uint256 price);
     event Purchased(address indexed buyer, address indexed seller, uint256 indexed typeId, uint256 amount, uint256 totalPrice);
@@ -30,6 +30,8 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
 
         totalMinted[typeId] += amount;
         _mint(to, typeId, amount, "");
+
+        prices[to][typeId] = 0;
     }
 
     // 가격 설정
