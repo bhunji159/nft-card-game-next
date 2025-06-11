@@ -69,11 +69,11 @@ contract GameManager {
             _mintMultiCard(msg.sender, id);
         } else if (rand < 65) {
             // 30% Uncommon
-            uint256 id = 4 + (rand % 2);
+            uint256 id = 4 + (rand % 3);
             _mintMultiCard(msg.sender, id);
         } else {
             // 35% Common
-            uint256 id = 6 + (rand % 2);
+            uint256 id = 6 + (rand % 3);
             _mintMultiCard(msg.sender, id);
         }
     }
@@ -105,15 +105,15 @@ contract GameManager {
 
         if (rand < 25) {
             // 25% Rare
-            uint256 id = 2 + (rand % 2); // 예: 2 또는 3
+            uint256 id = 2 + (rand % 2);
             _mintMultiCard(to, id);
         } else if (rand < 55) {
             // 30% Uncommon
-            uint256 id = 4 + (rand % 2); // 예: 4 또는 5
+            uint256 id = 4 + (rand % 3);
             _mintMultiCard(to, id);
         } else {
             // 45% Common
-            uint256 id = 6 + (rand % 2); // 예: 6 또는 7
+            uint256 id = 6 + (rand % 3);
             _mintMultiCard(to, id);
         }
     }
