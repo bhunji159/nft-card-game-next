@@ -26,6 +26,14 @@ async function main() {
 	);
 	await gameManager.deployed();
 	console.log("GameManager deployed to:", gameManager.address);
+
+	const tx1 = await multiNFT.transferOwnership(gameManager.address);
+	await tx1.wait();
+	console.log("MultiCardItems ownership transferred to GameManager");
+
+	const tx2 = await uniqueNFT.transferOwnership(gameManager.address);
+	await tx2.wait();
+	console.log("UniqueCardNFT ownership transferred to GameManager");
 }
 
 main()

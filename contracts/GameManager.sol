@@ -92,12 +92,30 @@ contract GameManager {
                 return;
             }
         }
-        revert("All unique cards minted");
+        _mintRandomMultiCard(to);
     }
 
     // 내부 함수: 멀티 카드 민팅
     function _mintMultiCard(address to, uint256 id) internal {
         multiNFT.mint(to, id, 1);
+    }
+
+    function _mintRandomMultiCard(address to) internal {
+        uint256 rand = uint256(keccak256(abi.encodePacked(block.timestamp, to, block.prevrandao))) % 100;
+
+        if (rand < 25) {
+            // 25% Rare
+            uint256 id = 2 + (rand % 2); // 예: 2 또는 3
+            _mintMultiCard(to, id);
+        } else if (rand < 55) {
+            // 30% Uncommon
+            uint256 id = 4 + (rand % 2); // 예: 4 또는 5
+            _mintMultiCard(to, id);
+        } else {
+            // 45% Common
+            uint256 id = 6 + (rand % 2); // 예: 6 또는 7
+            _mintMultiCard(to, id);
+        }
     }
 
     // NFT 컨트랙트 주소 변경

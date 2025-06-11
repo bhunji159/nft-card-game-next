@@ -9,7 +9,7 @@ import Modal from "../components/Modal";
 import GameManagerABI from "../../abis/GameManager.json";
 
 //------------------------------------------------
-const GAME_MANAGER_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+const GAME_MANAGER_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 //------------------------------------------------
 
 // 이후 GAME_MANAGER_ADDRESS 변수 사용
