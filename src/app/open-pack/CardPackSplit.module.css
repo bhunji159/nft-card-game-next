@@ -1,0 +1,53 @@
+.container {
+	position: relative;
+	width: 200px;
+	height: auto;
+	cursor: pointer;
+	user-select: none;
+	display: flex;
+	margin: 0 auto;
+	flex-direction: column;
+	transition: transform 0.2s ease;
+}
+
+.container:hover {
+	animation: shake 2.5s ease-in-out infinite;
+}
+
+.top {
+	width: 100%;
+	display: block;
+	margin-bottom: -4px;
+	transform-origin: top left;
+	transition: transform 0.6s ease, opacity 0.6s ease;
+	z-index: 2;
+	position: relative;
+}
+
+.top.opened {
+	transform: translate(-120%, -120%) rotate(-45deg);
+	opacity: 0;
+}
+
+.body {
+	width: 100%;
+	display: block;
+	z-index: 1;
+	position: relative;
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translate(0, 0) rotate(0deg);
+	}
+	20% {
+		transform: translate(2px, -2px) rotate(1deg);
+	}
+	50% {
+		transform: translate(-2px, 1px) rotate(-1deg);
+	}
+	80% {
+		transform: translate(2px, 2px) rotate(0.5deg);
+	}
+}

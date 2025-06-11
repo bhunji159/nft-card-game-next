@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ethers } from "ethers";
+import { utils } from "ethers";
+
 import { db } from "../../lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { verifyMessage } from "ethers";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -19,7 +19,7 @@ export default async function handler(
 	const nonce = "회원가입을 위해 서명해주세요.";
 
 	try {
-		const recovered = verifyMessage(nonce, signature);
+		const recovered = utils.verifyMessage(nonce, signature);
 		if (recovered.toLowerCase() !== walletAddress.toLowerCase()) {
 			return res.status(401).json({ message: "서명 검증 실패" });
 		}

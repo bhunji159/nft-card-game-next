@@ -10,6 +10,8 @@ contract GameManager {
 
     address public owner;
 
+    uint256 public cardPackPrice; // 카드팩 가격 (wei 단위)
+
     // Unique Cards
     mapping(uint256 => bool) public uniqueCardMinted;
     uint256[] public uniqueCardIds;
@@ -19,10 +21,11 @@ contract GameManager {
     uint256[] public multiCardIds;
     mapping(uint256 => string) public multiCardURIs;
 
-    constructor(address _uniqueNFT, address _multiNFT) {
+    constructor(address _uniqueNFT, address _multiNFT, uint256 _cardPackPrice) {
         uniqueNFT = UniqueCardNFT(_uniqueNFT);
         multiNFT = MultiCardItems(_multiNFT);
         owner = msg.sender;
+        cardPackPrice = _cardPackPrice;
     }
 
     modifier onlyOwner() {
@@ -30,7 +33,12 @@ contract GameManager {
         _;
     }
 
-    // Unique 등록
+    // 카드팩 가격 설정
+    function setCardPackPrice(uint256 _price) external onlyOwner {
+        cardPackPrice = _price;
+    }
+
+    // Unique 카드 등록
     function addUniqueCard(uint256 tokenId, string memory uri) external onlyOwner {
         require(!uniqueCardMinted[tokenId], "Card already registered");
         uniqueNFT.setTokenURI(tokenId, uri);
@@ -38,7 +46,7 @@ contract GameManager {
         uniqueCardURIs[tokenId] = uri;
     }
 
-    // MultiCard 등록
+    // Multi 카드 타입 등록
     function addMultiCardType(string memory uri) external onlyOwner returns (uint256) {
         uint256 typeId = multiNFT.createCardType(uri);
         multiCardIds.push(typeId);
@@ -46,8 +54,10 @@ contract GameManager {
         return typeId;
     }
 
-    // 카드팩 열기
-    function openCardPack() external {
+    // 카드팩 열기 (구매 및 민팅)
+    function openCardPack() external payable {
+        require(msg.value >= cardPackPrice, "Insufficient payment for card pack");
+
         uint256 rand = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.prevrandao))) % 100;
 
         if (rand < 10) {
@@ -68,6 +78,7 @@ contract GameManager {
         }
     }
 
+    // 내부 함수: 유니크 카드 민팅
     function _mintUniqueCard(address to) internal {
         for (uint i = 0; i < uniqueCardIds.length; i++) {
             uint256 tokenId = uniqueCardIds[i];
@@ -84,12 +95,19 @@ contract GameManager {
         revert("All unique cards minted");
     }
 
+    // 내부 함수: 멀티 카드 민팅
     function _mintMultiCard(address to, uint256 id) internal {
         multiNFT.mint(to, id, 1);
     }
 
+    // NFT 컨트랙트 주소 변경
     function setNFTContracts(address _uniqueNFT, address _multiNFT) external onlyOwner {
         uniqueNFT = UniqueCardNFT(_uniqueNFT);
         multiNFT = MultiCardItems(_multiNFT);
+    }
+
+    // 수익 출금
+    function withdraw() external onlyOwner {
+        payable(owner).transfer(address(this).balance);
     }
 }

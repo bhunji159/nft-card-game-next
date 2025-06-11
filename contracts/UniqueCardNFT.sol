@@ -65,4 +65,11 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     function getPrice(uint256 tokenId) external view returns (uint256) {
         return tokenPrices[tokenId];
     }
+    
+    function burn(uint256 tokenId) external {
+        require(ownerOf(tokenId) == msg.sender, "Not token owner");
+        _burn(tokenId);
+        tokenPrices[tokenId] = 0;
+    }
+
 }
