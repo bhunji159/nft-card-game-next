@@ -12,6 +12,9 @@ contract GameManager {
 
     uint256 public cardPackPrice; // 카드팩 가격 (wei 단위)
 
+    event UniqueCardMinted(address indexed user, uint256 tokenId, string uri);
+    event MultiCardMinted(address indexed user, uint256 typeId, string uri);
+
     // Unique Cards
     mapping(uint256 => bool) public uniqueCardMinted;
     uint256[] public uniqueCardIds;
@@ -89,6 +92,7 @@ contract GameManager {
                 uniqueNFT.mint(to, tokenId);
                 uniqueNFT.setTokenURI(tokenId, cardUri);
 
+                emit UniqueCardMinted(to, tokenId, cardUri);
                 return;
             }
         }
@@ -98,6 +102,7 @@ contract GameManager {
     // 내부 함수: 멀티 카드 민팅
     function _mintMultiCard(address to, uint256 id) internal {
         multiNFT.mint(to, id, 1);
+        emit MultiCardMinted(to, id, multiCardURIs[id]);
     }
 
     function _mintRandomMultiCard(address to) internal {
@@ -127,5 +132,44 @@ contract GameManager {
     // 수익 출금
     function withdraw() external onlyOwner {
         payable(owner).transfer(address(this).balance);
+    }
+
+    // 유저가 가진 Unique 카드 전체 조회
+    function getUserUniqueCards(address user) external view returns (uint256[] memory ids, string[] memory uris) {
+        uint count = 0;
+        for (uint i = 0; i < uniqueCardIds.length; i++) {
+            uint256 tokenId = uniqueCardIds[i];
+            if (uniqueCardMinted[tokenId] && uniqueNFT.ownerOf(tokenId) == user) {
+                count++;
+            }
+        }
+
+        ids = new uint256[](count);
+        uris = new string[](count);
+
+        uint index = 0;
+        for (uint i = 0; i < uniqueCardIds.length; i++) {
+            uint256 tokenId = uniqueCardIds[i];
+            if (uniqueCardMinted[tokenId] && uniqueNFT.ownerOf(tokenId) == user) {
+                ids[index] = tokenId;
+                uris[index] = uniqueCardURIs[tokenId];
+                index++;
+            }
+        }
+    }
+
+    // 유저가 가진 Multi 카드 전체 조회
+    function getUserMultiCards(address user) external view returns (uint256[] memory typeIds, uint256[] memory balances, string[] memory uris) {
+        uint len = multiCardIds.length;
+        typeIds = new uint256[](len);
+        balances = new uint256[](len);
+        uris = new string[](len);
+
+        for (uint i = 0; i < len; i++) {
+            uint256 id = multiCardIds[i];
+            typeIds[i] = id;
+            balances[i] = multiNFT.balanceOf(user, id);
+            uris[i] = multiCardURIs[id];
+        }
     }
 }

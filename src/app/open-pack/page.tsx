@@ -58,6 +58,7 @@ export default function OpenPackPage() {
 
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
 		const signer = provider.getSigner();
+		const userAddress = await signer.getAddress();
 		// const GAME_MANAGER_ADDRESS = ethers.utils.getAddress(rawAddress); // 자동 체크섬 적용
 
 		const contract = new ethers.Contract(
@@ -65,10 +66,59 @@ export default function OpenPackPage() {
 			GameManagerABI,
 			signer
 		);
+		const iface = new ethers.utils.Interface(GameManagerABI);
 		const priceWei = ethers.utils.parseEther(CARD_PACK_PRICE_ETH);
 
+		// const tx = await contract.openCardPack({ value: priceWei });
+		// await tx.wait();
+
 		const tx = await contract.openCardPack({ value: priceWei });
-		await tx.wait();
+		const receipt = await tx.wait();
+
+		/* 콘솔 디버깅용 */
+		for (const log of receipt.logs) {
+			if (log.address.toLowerCase() !== GAME_MANAGER_ADDRESS.toLowerCase()) continue;
+
+			try {
+				const parsed = iface.parseLog(log);
+
+				if (parsed.name === "UniqueCardMinted") {
+					const { user, tokenId, uri } = parsed.args;
+					console.log("Unique 카드 발급됨:", { user, tokenId, uri });
+				}
+
+				if (parsed.name === "MultiCardMinted") {
+					const { user, typeId, uri } = parsed.args;
+					console.log("Multi 카드 발급됨:", { user, typeId, uri });
+				}
+			} catch (err) {
+				console.warn("parseLog 실패:", err);
+				// ABI에 해당 이벤트가 없으면 무시
+			}
+		}
+
+		console.log("현재 보유 카드:");
+		try {
+			const [uniqueIds, uniqueUris] = await contract.getUserUniqueCards(userAddress);
+			console.log("Unique Cards:");
+			uniqueIds.forEach((id: any, i: any) => {
+				console.log(`- ID: ${id.toString()}, URI: ${uniqueUris[i]}`);
+			});
+		} catch (err) {
+			console.warn("Unique 카드 조회 실패:", err);
+		}
+		try {
+			const [multiTypeIds, multiBalances, multiUris] = await contract.getUserMultiCards(userAddress);
+			console.log("Multi Cards:");
+			multiTypeIds.forEach((id: any, i: any) => {
+				if (multiBalances[i].toString() !== "0") {
+					console.log(`- ID: ${id.toString()}, 수량: ${multiBalances[i].toString()}, URI: ${multiUris[i]}`);
+				}
+			});
+		} catch (err) {
+			console.warn("Multi 카드 조회 실패:", err);
+		}
+		/* 콘솔 디버깅용 */
 	}
 
 	const handleConfirm = async () => {
