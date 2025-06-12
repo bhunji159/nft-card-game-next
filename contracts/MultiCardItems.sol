@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MultiCardItems is ERC1155URIStorage, Ownable {
-    uint256 public nextTypeId = 1;
+    uint256 public nextTypeId = 3;
     mapping(uint256 => uint256) public totalMinted; // id -> 발행된 수량
     mapping(address => mapping(uint256 => uint256)) public prices; // 소유자 주소 -> (id -> 가격)
 

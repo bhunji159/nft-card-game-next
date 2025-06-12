@@ -68,15 +68,15 @@ contract GameManager {
             _mintUniqueCard(msg.sender);
         } else if (rand < 35) {
             // 25% Rare
-            uint256 id = 2 + (rand % 2);
+            uint256 id = 3 + (rand % 2);
             _mintMultiCard(msg.sender, id);
         } else if (rand < 65) {
             // 30% Uncommon
-            uint256 id = 4 + (rand % 3);
+            uint256 id = 5 + (rand % 3);
             _mintMultiCard(msg.sender, id);
         } else {
             // 35% Common
-            uint256 id = 6 + (rand % 3);
+            uint256 id = 7 + (rand % 3);
             _mintMultiCard(msg.sender, id);
         }
     }
@@ -110,15 +110,15 @@ contract GameManager {
 
         if (rand < 25) {
             // 25% Rare
-            uint256 id = 2 + (rand % 2);
+            uint256 id = 3 + (rand % 2);
             _mintMultiCard(to, id);
         } else if (rand < 55) {
             // 30% Uncommon
-            uint256 id = 4 + (rand % 3);
+            uint256 id = 5 + (rand % 3);
             _mintMultiCard(to, id);
         } else {
             // 45% Common
-            uint256 id = 6 + (rand % 3);
+            uint256 id = 8 + (rand % 3);
             _mintMultiCard(to, id);
         }
     }
