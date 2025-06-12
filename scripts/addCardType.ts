@@ -10,16 +10,16 @@ async function main() {
 	console.log("Using deployer:", deployer.address);
 
 	// 1. Unique 카드 등록 (고유 ID와 URI 지정)
-	// const uniqueCards = [
-	// 	{ tokenId: 1, uri: "ipfs://QmRvzEqNPuhD9o44ti36kieJ7hvzpWKhtWgu9GQiffNDut" },
-	// 	{ tokenId: 2, uri: "ipfs://QmYkjdnNgD98ihP1J34HCuWs1DfQhiABdcCgXp8M9cv9fx" },
-	// ];
+	const uniqueCards = [
+		{ tokenId: 1, uri: "ipfs://QmRvzEqNPuhD9o44ti36kieJ7hvzpWKhtWgu9GQiffNDut" },
+		{ tokenId: 2, uri: "ipfs://QmYkjdnNgD98ihP1J34HCuWs1DfQhiABdcCgXp8M9cv9fx" },
+	];
 
-	// for (const card of uniqueCards) {
-	// 	const tx = await gameManager.connect(deployer).addUniqueCard(card.tokenId, card.uri);
-	// 	await tx.wait();
-	// 	console.log(`Unique Card Registered: tokenId ${card.tokenId}, URI: ${card.uri}`);
-	// }
+	for (const card of uniqueCards) {
+		const tx = await gameManager.connect(deployer).addUniqueCard(card.tokenId, card.uri);
+		await tx.wait();
+		console.log(`Unique Card Registered: tokenId ${card.tokenId}, URI: ${card.uri}`);
+	}
 
 	// 2. Multi 카드 등록 (타입 자동 생성, URI 지정)
 	const multiCardURIs = [

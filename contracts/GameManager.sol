@@ -41,7 +41,7 @@ contract GameManager {
     // Unique 카드 등록
     function addUniqueCard(uint256 tokenId, string memory uri) external onlyOwner {
         require(!uniqueCardMinted[tokenId], "Card already registered");
-        uniqueNFT.setTokenURI(tokenId, uri);
+        //uniqueNFT.setTokenURI(tokenId, uri);
         uniqueCardIds.push(tokenId);
         uniqueCardURIs[tokenId] = uri;
     }
