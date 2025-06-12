@@ -2,5 +2,8 @@
   "name": "6.json",
   "description": "이상해씨",
   "image": "https://ipfs.io/ipfs/QmYk5J8th7cUF9U4KFC7MxcpNvpVJDzQR3i6YyyELvnQeE",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    }]
 }

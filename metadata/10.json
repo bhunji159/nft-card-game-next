@@ -2,5 +2,8 @@
   "name": "10.json",
   "description": "피카츄",
   "image": "https://ipfs.io/ipfs/QmebToXA1d8tgzPiFj32MUMk3bru2f8oETh49a13VTbRXd",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }]
 }

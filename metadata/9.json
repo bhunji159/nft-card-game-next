@@ -2,5 +2,8 @@
   "name": "9.json",
   "description": "피존투",
   "image": "https://ipfs.io/ipfs/QmccyEP3iGysZhhs4pwccjPdbzPqrYNhLN1BUGte8dN7JH",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }]
 }

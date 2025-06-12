@@ -10,9 +10,10 @@ async function main() {
 	console.log("Using deployer:", deployer.address);
 
 	// 1. Unique 카드 등록 (고유 ID와 URI 지정)
+	// 1. Unique 카드 등록 (고유 ID와 URI 지정)
 	const uniqueCards = [
-		{ tokenId: 1, uri: "ipfs://QmRvzEqNPuhD9o44ti36kieJ7hvzpWKhtWgu9GQiffNDut" },
-		{ tokenId: 2, uri: "ipfs://QmYkjdnNgD98ihP1J34HCuWs1DfQhiABdcCgXp8M9cv9fx" },
+		{ tokenId: 1, uri: "ipfs://QmZ5AnPhmFeezosBydKCN5ae21AGAQLoqmGhTrhKBvwk3F" },
+		{ tokenId: 2, uri: "ipfs://QmUCLwUWkvWkiVTggMSMMrmEuHaj7n8NnBcG7zmtFzAeEY" },
 	];
 
 	for (const card of uniqueCards) {
@@ -23,15 +24,16 @@ async function main() {
 
 	// 2. Multi 카드 등록 (타입 자동 생성, URI 지정)
 	const multiCardURIs = [
-		"ipfs://QmVHYaJDxrcTcFkzUCUCqvoHp5HF3Fc8MBuC9EpBKbmSwK",      // typeId = 3
-		"ipfs://QmbPXNjBtVkiMoHf1a6K7uXcEN9ZUQTYcm2DCrpykpo1XF",
-		"ipfs://QmTdpGzCgXyCsbnwZmWk9F5S5EDSuht5ChnQ3EWJLNKgAi",
-		"ipfs://QmYk5J8th7cUF9U4KFC7MxcpNvpVJDzQR3i6YyyELvnQeE",
-		"ipfs://QmXK3YSoDjNiZD1PiJVzWVoZyv6t74sLALqVNewY4RFYQQ",
-		"ipfs://QmT2i1bk3QJsA7LQgXXZvMZLrvoMW2YWRhSdgEmPZRe5D1",
-		"ipfs://QmccyEP3iGysZhhs4pwccjPdbzPqrYNhLN1BUGte8dN7JH",
-		"ipfs://QmebToXA1d8tgzPiFj32MUMk3bru2f8oETh49a13VTbRXd",    // typeId = 10
+		"ipfs://QmZqMKNTjnod4Ai3EghCu5xQjG6XAJbqUMfcwBD2VuHa83",      // typeId = 3
+		"ipfs://QmPkqKumiwyiV7tNp5Sof8C6SidLx9iiXhrKtiJk7aWvKx",
+		"ipfs://QmdZnrYPRp1MRwfSEz6nyWrh7KNJGVnVSWCbpN1S4ncUv8",
+		"ipfs://QmZEw8tQZS2GVdACjFP84YC8hksK9iHdQPT7jT38UqVC3B",
+		"ipfs://QmWug8T1vppefetiGG418ghWtVYUFX6xhd3AH4VDo9cxeW",
+		"ipfs://QmPQep1y1tyaeLBHJoQ2RxsNy95vPLLSQx2s2VSTgeJVM3",
+		"ipfs://Qmev9xEGtwr5PP41G4BCPEHDY55TkVNoQ8jBVAGTkyxuTf",
+		"ipfs://QmaMEfM8Cf1dwBUtL9p9vcL8FrcdphLBmYCtxTsjnUJw2D",    // typeId = 10
 	];
+
 
 	for (const uri of multiCardURIs) {
 		const tx = await gameManager.connect(deployer).addMultiCardType(uri);
