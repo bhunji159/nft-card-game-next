@@ -92,4 +92,13 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     function uri(uint256 typeId) public view override returns (string memory) {
         return super.uri(typeId);
     }
+
+    function burn(address account, uint256 id, uint256 amount) external {
+        require(
+            account == _msgSender() || isApprovedForAll(account, _msgSender()),
+            "Not owner nor approved"
+        );
+        _burn(account, id, amount);
+        totalMinted[id] -= amount;
+    }
 }

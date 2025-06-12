@@ -1,0 +1,10 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node", // bundler -> node 로 변경
+		"target": "es2020",
+		"noEmit": false
+	},
+	"include": ["./hardhat.config.ts", "./scripts", "./test"]
+}

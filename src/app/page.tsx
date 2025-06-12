@@ -41,6 +41,12 @@ export default function Home() {
 					</button>
 				</Link>
 			</div>
+
+			<div className={styles["button-wrapper"]}>
+				<Link href="/open-pack">
+					<button className={styles["navigate-button"]}>카드 개봉하기</button>
+				</Link>
+			</div>
 		</div>
 	);
 }
