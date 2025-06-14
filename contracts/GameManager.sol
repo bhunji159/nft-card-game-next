@@ -222,6 +222,81 @@ contract GameManager {
         return multiNFT.getIsOnSale(seller, typeId);
     }
 
+    // 판매 중인 UniqueCard 목록 조회
+    function getAllOnSaleUniqueCards() external view returns (uint256[] memory ids, uint256[] memory prices, string[] memory uris) {
+        uint count = 0;
+
+        // 몇 개 있는지 계산
+        for (uint i = 0; i < uniqueCardIds.length; i++) {
+            uint256 id = uniqueCardIds[i];
+            if (uniqueNFT.getIsOnSale(id)) {
+                count++;
+            }
+        }
+
+        // 결과 배열 선언
+        ids = new uint256[](count);
+        prices = new uint256[](count);
+        uris = new string[](count);
+
+        // 판매 데이터 수집
+        uint index = 0;
+        for (uint i = 0; i < uniqueCardIds.length; i++) {
+            uint256 id = uniqueCardIds[i];
+            if (uniqueNFT.getIsOnSale(id)) {
+                ids[index] = id;
+                prices[index] = uniqueNFT.getPrice(id);
+                uris[index] = uniqueCardURIs[id];
+                index++;
+            }
+        }
+
+        return (ids, prices, uris);
+    }
+
+    // 판매 중인 MultiCard 목록 조회
+    function getAllOnSaleMultiCards() external view returns (address[] memory sellers, uint256[] memory typeIds, uint256[] memory prices, string[] memory uris) {
+        uint count = 0;
+
+        // 전체 크기 계산
+        for (uint i = 0; i < multiCardIds.length; i++) {
+            uint256 typeId = multiCardIds[i];
+            address[] memory sellerList = multiNFT.getSellersByTypeId(typeId);
+
+            for (uint j = 0; j < sellerList.length; j++) {
+                if (multiNFT.getIsOnSale(sellerList[j], typeId)) {
+                    count++;
+                }
+            }
+        }
+
+        // 결과 배열 선언
+        sellers = new address[](count);
+        typeIds = new uint256[](count);
+        prices = new uint256[](count);
+        uris = new string[](count);
+
+        // 판매 데이터 수집
+        uint index = 0;
+        for (uint i = 0; i < multiCardIds.length; i++) {
+            uint256 typeId = multiCardIds[i];
+            address[] memory sellerList = multiNFT.getSellersByTypeId(typeId);
+
+            for (uint j = 0; j < sellerList.length; j++) {
+                address seller = sellerList[j];
+                if (multiNFT.getIsOnSale(seller, typeId)) {
+                    sellers[index] = seller;
+                    typeIds[index] = typeId;
+                    prices[index] = multiNFT.getPrice(seller, typeId);
+                    uris[index] = multiCardURIs[typeId];
+                    index++;
+                }
+            }
+        }
+
+        return (sellers, typeIds, prices, uris);
+    }
+
     // NFT 컨트랙트 주소 변경
     function setNFTContracts(address _uniqueNFT, address _multiNFT) external onlyOwner {
         uniqueNFT = UniqueCardNFT(_uniqueNFT);
@@ -255,6 +330,8 @@ contract GameManager {
                 index++;
             }
         }
+
+        return (ids, uris);
     }
 
     // 유저가 가진 Multi 카드 전체 조회
@@ -270,5 +347,7 @@ contract GameManager {
             balances[i] = multiNFT.balanceOf(user, id);
             uris[i] = multiCardURIs[id];
         }
+
+        return (typeIds, balances, uris);
     }
 }

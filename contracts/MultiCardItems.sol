@@ -9,6 +9,7 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     mapping(uint256 => uint256) public totalMinted; // id -> 발행된 수량
     mapping(address => mapping(uint256 => uint256)) public prices; // 소유자 주소 -> (id -> 가격)
     mapping(address => mapping(uint256 => bool)) public isOnSale;  // 소유자 주소 -> (id -> 판매 상태)
+    mapping(uint256 => address[]) public sellersByTypeId;          // typeId -> 판매자
 
     uint256 public constant MAX_SUPPLY_PER_TYPE = 20;
 
@@ -42,6 +43,18 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
         require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
         prices[msg.sender][typeId] = priceWei;
         isOnSale[msg.sender][typeId] = true;
+
+        // SellersByTypeId에 추가
+        bool alreadyListed = false;
+        for (uint i = 0; i < sellersByTypeId[typeId].length; i++) {
+            if (sellersByTypeId[typeId][i] == msg.sender) {
+                alreadyListed = true;
+                break;
+            }
+        }
+        if (!alreadyListed) {
+            sellersByTypeId[typeId].push(msg.sender);
+        }
 
         emit PriceSet(msg.sender, typeId, priceWei);
     }
@@ -80,14 +93,29 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     // 판매 취소
     function cancelSale(uint256 typeId) external {
         require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
+        require(isOnSale[msg.sender][typeId], "Not on sale");
         prices[msg.sender][typeId] = 0;
         isOnSale[msg.sender][typeId] = false;
+
+        // SellersByTypeId에서 제거
+        address[] storage sellers = sellersByTypeId[typeId];
+        for (uint i = 0; i < sellers.length; i++) {
+            if (sellers[i] == msg.sender) {
+                sellers[i] = sellers[sellers.length - 1]; // 마지막 요소와 스왑
+                sellers.pop();                            // 제거
+                break;
+            }
+        }
 
         emit SaleCancelled(msg.sender, typeId);
     }
 
     function getIsOnSale(address seller, uint256 typeId) external view returns (bool) {
         return isOnSale[seller][typeId];
+    }
+
+    function getSellersByTypeId(uint256 typeId) external view returns (address[] memory) {
+        return sellersByTypeId[typeId];
     }
 
     // 발행 가능 수량 조회
