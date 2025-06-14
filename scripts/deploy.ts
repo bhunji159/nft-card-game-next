@@ -34,6 +34,14 @@ async function main() {
 	const tx2 = await uniqueNFT.transferOwnership(gameManager.address);
 	await tx2.wait();
 	console.log("UniqueCardNFT ownership transferred to GameManager");
+
+	let tx3 = await uniqueNFT.setGameManager(gameManager.address);
+    await tx3.wait();
+    console.log("Set GameManager in UniqueCardNFT");
+
+    let tx4 = await multiNFT.setGameManager(gameManager.address);
+    await tx4.wait();
+    console.log("Set GameManager in MultiCardItems");
 }
 
 main()

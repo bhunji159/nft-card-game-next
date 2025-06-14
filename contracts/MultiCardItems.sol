@@ -11,6 +11,8 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     mapping(address => mapping(uint256 => bool)) public isOnSale;  // 소유자 주소 -> (id -> 판매 상태)
     mapping(uint256 => address[]) public sellersByTypeId;          // typeId -> 판매자
 
+    address public gameManager;
+
     uint256 public constant MAX_SUPPLY_PER_TYPE = 20;
 
     event PriceSet(address indexed seller, uint256 indexed typeId, uint256 price);
@@ -18,6 +20,10 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     event Purchased(address indexed buyer, address indexed seller, uint256 indexed typeId, uint256 amount, uint256 totalPrice);
 
     constructor() Ownable(msg.sender) ERC1155("") {}
+
+    function setGameManager(address _manager) external onlyOwner {
+        gameManager = _manager;
+    }
 
     // 카드 타입 생성 및 URI 지정 (id 자동 증가)
     function createCardType(string memory cardURI) external onlyOwner returns (uint256) {
@@ -65,29 +71,36 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     }
 
     // 카드 구매
-    function purchase(address seller, uint256 typeId, uint256 amount) external payable {
-        require(_isValidTypeId(typeId), "Invalid typeId");
-        require(amount > 0, "Amount must be > 0");
-        require(balanceOf(seller, typeId) >= amount, "Seller lacks balance");
+    // function purchase(address seller, uint256 typeId, uint256 amount) external payable {
+    //     require(_isValidTypeId(typeId), "Invalid typeId");
+    //     require(amount > 0, "Amount must be > 0");
+    //     require(balanceOf(seller, typeId) >= amount, "Seller lacks balance");
 
-        uint256 price = prices[seller][typeId];
-        require(price > 0, "Not for sale");
-        uint256 totalPrice = price * amount;
-        require(msg.value >= totalPrice, "Insufficient ETH");
+    //     uint256 price = prices[seller][typeId];
+    //     require(price > 0, "Not for sale");
+    //     uint256 totalPrice = price * amount;
+    //     require(msg.value >= totalPrice, "Insufficient ETH");
 
-        // Transfer NFT
-        _safeTransferFrom(seller, msg.sender, typeId, amount, "");
+    //     // Transfer NFT
+    //     _safeTransferFrom(seller, msg.sender, typeId, amount, "");
 
-        // Pay seller
-        payable(seller).transfer(totalPrice);
+    //     // Pay seller
+    //     payable(seller).transfer(totalPrice);
 
-        // Refund excess
-        if (msg.value > totalPrice) {
-            payable(msg.sender).transfer(msg.value - totalPrice);
-        }
+    //     // Refund excess
+    //     if (msg.value > totalPrice) {
+    //         payable(msg.sender).transfer(msg.value - totalPrice);
+    //     }
 
+    //     isOnSale[seller][typeId] = false;
+    //     emit Purchased(msg.sender, seller, typeId, amount, totalPrice);
+    // }
+
+    function finalizeSale(address seller, uint256 typeId) external {
+        require(msg.sender == gameManager, "Only GameManager can finalize");
+
+        prices[seller][typeId] = 0;
         isOnSale[seller][typeId] = false;
-        emit Purchased(msg.sender, seller, typeId, amount, totalPrice);
     }
 
     // 판매 취소

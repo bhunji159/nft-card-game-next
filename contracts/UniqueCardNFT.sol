@@ -13,6 +13,12 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     event SaleCanceled(address indexed owner, uint256 indexed tokenId);
     event Purchased(address indexed buyer, address indexed seller, uint256 indexed tokenId, uint256 price);
 
+    address public gameManager;
+
+    function setGameManager(address _manager) external onlyOwner {
+        gameManager = _manager;
+    }
+
     constructor() Ownable(msg.sender) ERC721("UniqueCard", "UC") {}
 
     // 발행
@@ -38,26 +44,34 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     }
 
     // 거래
-    function purchase(uint256 tokenId) external payable {
-        address seller = ownerOf(tokenId);
-        uint256 price = tokenPrices[tokenId];
+    // function purchase(uint256 tokenId) external payable {
+    //     address seller = ownerOf(tokenId);
+    //     uint256 price = tokenPrices[tokenId];
 
-        require(price > 0, "Not for sale");
-        require(msg.value >= price, "Insufficient payment");
-        require(seller != msg.sender, "You already own this");
+    //     require(price > 0, "Not for sale");
+    //     require(msg.value >= price, "Insufficient payment");
+    //     require(seller != msg.sender, "You already own this");
 
-        _transfer(seller, msg.sender, tokenId);
+    //     _transfer(seller, msg.sender, tokenId);
 
-        payable(seller).transfer(price);
+    //     payable(seller).transfer(price);
 
-        if (msg.value > price) {
-            payable(msg.sender).transfer(msg.value - price);
-        }
+    //     if (msg.value > price) {
+    //         payable(msg.sender).transfer(msg.value - price);
+    //     }
+
+    //     tokenPrices[tokenId] = 0;
+    //     isOnSale[tokenId] = false;
+
+    //     emit Purchased(msg.sender, seller, tokenId, price);
+    // }
+
+    // 판매 상태 초기화
+    function finalizeSale(uint256 tokenId) external {
+        require(msg.sender == gameManager, "Only GameManager can finalize sale");
 
         tokenPrices[tokenId] = 0;
         isOnSale[tokenId] = false;
-
-        emit Purchased(msg.sender, seller, tokenId, price);
     }
 
     // 판매 취소

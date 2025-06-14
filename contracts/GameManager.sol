@@ -170,6 +170,8 @@ contract GameManager {
             payable(msg.sender).transfer(msg.value - price);
         }
 
+        uniqueNFT.finalizeSale(tokenId);
+
         emit UniqueCardPurchased(msg.sender, tokenId, uniqueCardURIs[tokenId]);
     }
 
@@ -193,6 +195,9 @@ contract GameManager {
         if (msg.value > totalPrice) {
             payable(msg.sender).transfer(msg.value - totalPrice);
         }
+
+        // 판매 상태 초기화
+        multiNFT.finalizeSale(seller, typeId);
 
         emit MultiCardPurchased(msg.sender, typeId, multiCardURIs[typeId]);
     }
