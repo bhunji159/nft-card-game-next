@@ -98,11 +98,22 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     //     emit Purchased(msg.sender, seller, typeId, amount, totalPrice);
     // }
 
-    function finalizeSale(address seller, uint256 typeId) external {
+    function finalizeSale(address seller, uint256 typeId, uint amount) external {
         require(msg.sender == gameManager, "Only GameManager can finalize");
 
-        prices[seller][typeId] = 0;
-        isOnSale[seller][typeId] = false;
+        uint currentAmount = saleAmounts[seller][typeId];
+
+        require(currentAmount >= amount, "Finalize amount exceeds sale amount");
+
+        if (currentAmount == amount) {
+            // 모두 판매된 경우: 상태 초기화
+            prices[seller][typeId] = 0;
+            saleAmounts[seller][typeId] = 0;
+            isOnSale[seller][typeId] = false;
+        } else {
+            // 일부만 판매된 경우: 수량만 감소
+            saleAmounts[seller][typeId] = currentAmount - amount;
+        }
     }
 
     // 판매 취소
