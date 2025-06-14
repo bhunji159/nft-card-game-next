@@ -7,8 +7,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract UniqueCardNFT is ERC721URIStorage, Ownable {
 
     mapping(uint256 => uint256) public tokenPrices; // 토큰 ID -> 가격
+    mapping(uint256 => bool) public isOnSale;   // 토큰 ID -> 판매중 여부
 
     event PriceSet(address indexed owner, uint256 indexed tokenId, uint256 price);
+    event SaleCanceled(address indexed owner, uint256 indexed tokenId);
     event Purchased(address indexed buyer, address indexed seller, uint256 indexed tokenId, uint256 price);
 
     constructor() Ownable(msg.sender) ERC721("UniqueCard", "UC") {}
@@ -17,6 +19,7 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     function mint(address to, uint256 tokenId) external onlyOwner {
         _safeMint(to, tokenId);
         tokenPrices[tokenId] = 0;
+        isOnSale[tokenId] = false;
     }
 
     // URI 설정
@@ -29,6 +32,7 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     function setPrice(uint256 tokenId, uint256 price) external {
         require(ownerOf(tokenId) == msg.sender, "Not the owner");
         tokenPrices[tokenId] = price;
+        isOnSale[tokenId] = true;
 
         emit PriceSet(msg.sender, tokenId, price);
     }
@@ -51,8 +55,22 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
         }
 
         tokenPrices[tokenId] = 0;
+        isOnSale[tokenId] = false;
 
         emit Purchased(msg.sender, seller, tokenId, price);
+    }
+
+    // 판매 취소
+    function cancelSale(uint256 tokenId) external {
+        require(ownerOf(tokenId) == msg.sender, "Not token owner");
+        tokenPrices[tokenId] = 0;
+        isOnSale[tokenId] = false;
+
+        emit SaleCanceled(msg.sender, tokenId);
+    }
+
+    function getIsOnSale(uint256 tokenId) external view returns (bool) {
+        return isOnSale[tokenId];
     }
 
     // URI 확인

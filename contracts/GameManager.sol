@@ -14,6 +14,8 @@ contract GameManager {
 
     event UniqueCardMinted(address indexed user, uint256 tokenId, string uri);
     event MultiCardMinted(address indexed user, uint256 typeId, string uri);
+    event UniqueCardPurchased(address buyer, uint256 tokenId, string uri);
+    event MultiCardPurchased(address buyer, uint256 typeId, string uri);
 
     // Unique Cards
     mapping(uint256 => bool) public uniqueCardMinted;
@@ -23,6 +25,15 @@ contract GameManager {
     // Multi Cards
     uint256[] public multiCardIds;
     mapping(uint256 => string) public multiCardURIs;
+
+    // UniqueCard 판매 정보
+    mapping(uint256 => address) public uniqueCardSeller; // tokenId -> seller (주소)
+    mapping(uint256 => uint256) public uniqueCardPrice;
+    mapping(uint256 => bool) public uniqueCardOnSale;
+
+    // MultiCard 판매 정보
+    mapping(address => mapping(uint256 => uint256)) public multiCardPrices; // seller -> typeId -> 가격
+    mapping(address => mapping(uint256 => bool)) public multiCardOnSale;
 
     constructor(address _uniqueNFT, address _multiNFT, uint256 _cardPackPrice) {
         uniqueNFT = UniqueCardNFT(_uniqueNFT);
@@ -121,6 +132,94 @@ contract GameManager {
             uint256 id = 8 + (rand % 3);
             _mintMultiCard(to, id);
         }
+    }
+
+    // 유니크 카드 판대 등록
+    function setUniqueCardForSale(uint256 tokenId, uint256 price) external {
+        require(uniqueNFT.ownerOf(tokenId) == msg.sender, "Not token owner");
+        uniqueNFT.setPrice(tokenId, price);
+    }
+
+    // 멀티 카드 판매 등록
+    function setMultiCardForSale(uint256 typeId, uint256 price) external {
+        require(multiNFT.balanceOf(msg.sender, typeId) > 0, "You don't own this type");
+        multiNFT.setPrice(typeId, price);
+    }
+
+    // 유니크 카드 판매 취소
+    function cancelUniqueCardForSale(uint256 tokenId) external {
+        require(uniqueNFT.ownerOf(tokenId) == msg.sender, "Not token owner");
+        uniqueNFT.cancelSale(tokenId);
+    }
+
+    // 멀티 카드 판매 취소
+    function cancelMultiCardForSale(uint256 typeId) external {
+        require(multiNFT.balanceOf(msg.sender, typeId) > 0, "Not token owner");
+        multiNFT.cancelSale(typeId);
+    }
+
+    // 유니크 카드 구매
+    function buyUniqueCard(uint256 tokenId) external payable {
+        address seller = uniqueNFT.ownerOf(tokenId);
+        require(seller != address(0), "Invalid token");
+        require(seller != msg.sender, "You already own this");
+
+        uint256 price = uniqueNFT.getPrice(tokenId);
+        require(price > 0, "Not for sale");
+        require(msg.value >= price, "Insufficient payment");
+
+        // 소유권 이전
+        uniqueNFT.safeTransferFrom(seller, msg.sender, tokenId);
+
+        // 판매자에게 가격 송금
+        payable(seller).transfer(price);
+
+        // 잔액 환불
+        if (msg.value > price) {
+            payable(msg.sender).transfer(msg.value - price);
+        }
+
+        emit UniqueCardPurchased(msg.sender, tokenId, uniqueCardURIs[tokenId]);
+    }
+
+    // 멀티 카드 구매
+    function buyMultiCard(address seller, uint256 typeId, uint256 amount) external payable {
+        require(seller != address(0), "Invalid seller");
+        require(seller != msg.sender, "You already own this");
+
+        uint256 pricePerUnit = multiNFT.getPrice(seller, typeId);
+        require(pricePerUnit > 0, "Not for sale");
+        uint256 totalPrice = pricePerUnit * amount;
+        require(msg.value >= totalPrice, "Insufficient payment");
+
+        // 소유권 이전 (ERC1155 safeTransferFrom)
+        multiNFT.safeTransferFrom(seller, msg.sender, typeId, amount, "");
+
+        // 판매자에게 송금
+        payable(seller).transfer(totalPrice);
+
+        // 잔액 환불
+        if (msg.value > totalPrice) {
+            payable(msg.sender).transfer(msg.value - totalPrice);
+        }
+
+        emit MultiCardPurchased(msg.sender, typeId, multiCardURIs[typeId]);
+    }
+
+    function getUniqueCardPrice(uint256 tokenId) external view returns (uint256) {
+        return uniqueNFT.getPrice(tokenId);
+    }
+
+    function getMultiCardPrice(address seller, uint256 typeId) external view returns (uint256) {
+        return multiNFT.getPrice(seller, typeId);
+    }
+
+    function isUniqueCardOnSale(uint256 tokenId) external view returns (bool) {
+        return uniqueNFT.getIsOnSale(tokenId);
+    }
+
+    function isMultiCardOnSale(address seller, uint256 typeId) external view returns (bool) {
+        return multiNFT.getIsOnSale(seller, typeId);
     }
 
     // NFT 컨트랙트 주소 변경

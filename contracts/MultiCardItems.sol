@@ -8,10 +8,12 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     uint256 public nextTypeId = 3;
     mapping(uint256 => uint256) public totalMinted; // id -> 발행된 수량
     mapping(address => mapping(uint256 => uint256)) public prices; // 소유자 주소 -> (id -> 가격)
+    mapping(address => mapping(uint256 => bool)) public isOnSale;  // 소유자 주소 -> (id -> 판매 상태)
 
     uint256 public constant MAX_SUPPLY_PER_TYPE = 20;
 
     event PriceSet(address indexed seller, uint256 indexed typeId, uint256 price);
+    event SaleCancelled(address indexed seller, uint256 indexed typeId);
     event Purchased(address indexed buyer, address indexed seller, uint256 indexed typeId, uint256 amount, uint256 totalPrice);
 
     constructor() Ownable(msg.sender) ERC1155("") {}
@@ -32,12 +34,14 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
         _mint(to, typeId, amount, "");
 
         prices[to][typeId] = 0;
+        isOnSale[to][typeId] = false;
     }
 
     // 가격 설정
     function setPrice(uint256 typeId, uint256 priceWei) external {
         require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
         prices[msg.sender][typeId] = priceWei;
+        isOnSale[msg.sender][typeId] = true;
 
         emit PriceSet(msg.sender, typeId, priceWei);
     }
@@ -69,7 +73,21 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
             payable(msg.sender).transfer(msg.value - totalPrice);
         }
 
+        isOnSale[seller][typeId] = false;
         emit Purchased(msg.sender, seller, typeId, amount, totalPrice);
+    }
+
+    // 판매 취소
+    function cancelSale(uint256 typeId) external {
+        require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
+        prices[msg.sender][typeId] = 0;
+        isOnSale[msg.sender][typeId] = false;
+
+        emit SaleCancelled(msg.sender, typeId);
+    }
+
+    function getIsOnSale(address seller, uint256 typeId) external view returns (bool) {
+        return isOnSale[seller][typeId];
     }
 
     // 발행 가능 수량 조회
