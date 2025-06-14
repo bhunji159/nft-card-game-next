@@ -132,9 +132,10 @@ contract GameManager {
     }
 
     // 멀티 카드 판매 등록
-    function setMultiCardForSale(uint256 typeId, uint256 price) external {
-        require(multiNFT.balanceOf(msg.sender, typeId) > 0, "You don't own this type");
-        multiNFT.setPrice(typeId, price);
+    function setMultiCardForSale(uint256 typeId, uint256 price, uint256 amount) external {
+        //require(multiNFT.balanceOf(msg.sender, typeId) > 0, "You don't own this type");
+        require(multiNFT.balanceOf(msg.sender, typeId) >= amount, "Not enough balance");
+        multiNFT.setPrice(typeId, price, amount);
     }
 
     // 유니크 카드 판매 취소

@@ -8,6 +8,7 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     uint256 public nextTypeId = 3;
     mapping(uint256 => uint256) public totalMinted; // id -> 발행된 수량
     mapping(address => mapping(uint256 => uint256)) public prices; // 소유자 주소 -> (id -> 가격)
+    mapping(address => mapping(uint256 => uint256)) public saleAmounts; // 소유자 주소 -> (id -> 판매 수량)
     mapping(address => mapping(uint256 => bool)) public isOnSale;  // 소유자 주소 -> (id -> 판매 상태)
     mapping(uint256 => address[]) public sellersByTypeId;          // typeId -> 판매자
 
@@ -45,9 +46,10 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     }
 
     // 가격 설정
-    function setPrice(uint256 typeId, uint256 priceWei) external {
+    function setPrice(uint256 typeId, uint256 priceWei, uint256 amount) external {
         require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
         prices[msg.sender][typeId] = priceWei;
+        saleAmounts[msg.sender][typeId] = amount;
         isOnSale[msg.sender][typeId] = true;
 
         // SellersByTypeId에 추가
