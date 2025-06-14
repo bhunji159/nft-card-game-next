@@ -4,25 +4,34 @@ import { useEffect, useState } from "react";
 import { useWallet } from "../../lib/useWallet";
 import { ethers } from "ethers";
 import styles from "./OpenPackPage.module.css";
-import CardPackSplit from "./CardPackSplit";
+import CardItem from "../components/CardItem";
 import Modal from "../components/Modal";
 import GameManagerABI from "../../abis/GameManager.json";
+import { addOwnedCard, FirebaseCardMeta } from "../../lib/firebaseUser";
 
-//------------------------------------------------
 const GAME_MANAGER_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-//------------------------------------------------
+const CARD_PACK_PRICE_ETH = "1";
 
-// 이후 GAME_MANAGER_ADDRESS 변수 사용
+interface CardMeta {
+	name: string;
+	image: string;
+	rarity: string;
+}
 
-const CARD_PACK_PRICE_ETH = "1"; // 1 이더(또는 테스트넷 이더)
-
-export default function OpenPackPage() {
+export default function OpenPackPage({ onBack }: { onBack: () => void }) {
 	const { walletAddress } = useWallet();
+
 	const [coinBalance, setCoinBalance] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [txLoading, setTxLoading] = useState(false);
-	const [showAnimation, setShowAnimation] = useState(false);
 	const [showModal, setShowModal] = useState(false);
+
+	// 애니메이션 상태
+	const [showCard, setShowCard] = useState(false);
+	const [packCovered, setPackCovered] = useState(false);
+
+	// 마지막 발급 카드 정보
+	const [lastMintedCard, setLastMintedCard] = useState<CardMeta | null>(null);
 
 	useEffect(() => {
 		if (!walletAddress || !window.ethereum) return;
@@ -31,7 +40,7 @@ export default function OpenPackPage() {
 			setLoading(true);
 			try {
 				const provider = new ethers.providers.Web3Provider(window.ethereum);
-				const balanceWei = await provider.getBalance(walletAddress);
+				const balanceWei = await provider.getBalance(walletAddress!);
 				const balanceEth = ethers.utils.formatEther(balanceWei);
 				setCoinBalance(parseFloat(balanceEth).toFixed(4));
 			} catch (error) {
@@ -41,7 +50,6 @@ export default function OpenPackPage() {
 				setLoading(false);
 			}
 		}
-
 		fetchBalance();
 	}, [walletAddress]);
 
@@ -53,13 +61,40 @@ export default function OpenPackPage() {
 		return <p className={styles.message}>데이터를 불러오는 중입니다...</p>;
 	}
 
+	// 메타데이터에서 name, image, rarity 모두 가져옴
+	async function fetchMetadata(uri: string): Promise<CardMeta> {
+		try {
+			const url = uri.startsWith("ipfs://")
+				? uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+				: uri;
+
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error("메타데이터 로드 실패");
+			}
+			const data = await response.json();
+
+			const rarityAttr = data.attributes?.find(
+				(attr: any) => attr.trait_type === "Rarity"
+			);
+
+			return {
+				name: data.description || "Unknown",
+				image: data.image || "",
+				rarity: rarityAttr?.value || "Unknown",
+			};
+		} catch (error) {
+			console.error("메타데이터 파싱 실패:", error);
+			return { name: "Unknown", image: "", rarity: "Unknown" };
+		}
+	}
+
 	async function openCardPack() {
 		if (!window.ethereum) throw new Error("메타마스크가 필요합니다.");
 
 		const provider = new ethers.providers.Web3Provider(window.ethereum);
 		const signer = provider.getSigner();
 		const userAddress = await signer.getAddress();
-		// const GAME_MANAGER_ADDRESS = ethers.utils.getAddress(rawAddress); // 자동 체크섬 적용
 
 		const contract = new ethers.Contract(
 			GAME_MANAGER_ADDRESS,
@@ -69,64 +104,63 @@ export default function OpenPackPage() {
 		const iface = new ethers.utils.Interface(GameManagerABI);
 		const priceWei = ethers.utils.parseEther(CARD_PACK_PRICE_ETH);
 
-		// const tx = await contract.openCardPack({ value: priceWei });
-		// await tx.wait();
-
 		const tx = await contract.openCardPack({ value: priceWei });
 		const receipt = await tx.wait();
 
-		/* 콘솔 디버깅용 */
+		let mintedCardUri: string | null = null;
+		let mintedTokenId: number | string | null = null;
+
 		for (const log of receipt.logs) {
-			if (log.address.toLowerCase() !== GAME_MANAGER_ADDRESS.toLowerCase()) continue;
+			if (log.address.toLowerCase() !== GAME_MANAGER_ADDRESS.toLowerCase())
+				continue;
 
 			try {
 				const parsed = iface.parseLog(log);
 
 				if (parsed.name === "UniqueCardMinted") {
-					const { user, tokenId, uri } = parsed.args;
-					console.log("Unique 카드 발급됨:", { user, tokenId, uri });
+					const { tokenId, uri } = parsed.args;
+					mintedCardUri = uri;
+					mintedTokenId = tokenId.toString();
 				}
 
 				if (parsed.name === "MultiCardMinted") {
-					const { user, typeId, uri } = parsed.args;
-					console.log("Multi 카드 발급됨:", { user, typeId, uri });
+					const { typeId, uri } = parsed.args;
+					mintedCardUri = uri;
+					mintedTokenId = typeId.toString();
 				}
-			} catch (err) {
-				console.warn("parseLog 실패:", err);
-				// ABI에 해당 이벤트가 없으면 무시
+			} catch {
+				// 무시
 			}
 		}
 
-		console.log("현재 보유 카드:");
-		try {
-			const [uniqueIds, uniqueUris] = await contract.getUserUniqueCards(userAddress);
-			console.log("Unique Cards:");
-			uniqueIds.forEach((id: any, i: any) => {
-				console.log(`- ID: ${id.toString()}, URI: ${uniqueUris[i]}`);
-			});
-		} catch (err) {
-			console.warn("Unique 카드 조회 실패:", err);
+		if (mintedCardUri && mintedTokenId !== null) {
+			const cardMeta = await fetchMetadata(mintedCardUri);
+			setLastMintedCard(cardMeta);
+			setShowCard(true);
+			setPackCovered(false);
+
+			if (walletAddress) {
+				// Firebase 저장용 객체 생성
+				const firebaseCardMeta: FirebaseCardMeta = {
+					tokenId: mintedTokenId,
+					uri: mintedCardUri,
+					rarity: cardMeta.rarity,
+					name: cardMeta.name,
+				};
+				await addOwnedCard(walletAddress, firebaseCardMeta);
+			}
 		}
-		try {
-			const [multiTypeIds, multiBalances, multiUris] = await contract.getUserMultiCards(userAddress);
-			console.log("Multi Cards:");
-			multiTypeIds.forEach((id: any, i: any) => {
-				if (multiBalances[i].toString() !== "0") {
-					console.log(`- ID: ${id.toString()}, 수량: ${multiBalances[i].toString()}, URI: ${multiUris[i]}`);
-				}
-			});
-		} catch (err) {
-			console.warn("Multi 카드 조회 실패:", err);
-		}
-		/* 콘솔 디버깅용 */
 	}
+
+	const handleCardAnimationEnd = () => {
+		setPackCovered(true);
+	};
 
 	const handleConfirm = async () => {
 		setShowModal(false);
 		setTxLoading(true);
 		try {
 			await openCardPack();
-			setShowAnimation(true);
 		} catch (error: any) {
 			alert("카드팩 구매 실패: " + (error?.message || error));
 			console.log(error?.message || error);
@@ -156,7 +190,7 @@ export default function OpenPackPage() {
 
 			{txLoading && <p className={styles.message}>거래 처리 중...</p>}
 
-			{!showAnimation && !txLoading && (
+			{!showCard && !txLoading && (
 				<div className={styles.buttonGroup}>
 					<button
 						className={styles.actionButton}
@@ -164,10 +198,11 @@ export default function OpenPackPage() {
 					>
 						카드팩 구매하기
 					</button>
+					<button className={styles.backButton} onClick={onBack}>
+						뒤로가기
+					</button>
 				</div>
 			)}
-
-			{showAnimation && <CardPackSplit />}
 
 			{showModal && (
 				<Modal
@@ -176,6 +211,54 @@ export default function OpenPackPage() {
 					onConfirm={handleConfirm}
 				/>
 			)}
+
+			<div className={styles.myBox}>
+				{showCard && lastMintedCard && !packCovered && (
+					<CardItem
+						name={lastMintedCard.name}
+						image={lastMintedCard.image}
+						rarity={lastMintedCard.rarity}
+						className={styles.cardFlying}
+						onAnimationEnd={handleCardAnimationEnd}
+					/>
+				)}
+
+				{!showCard && packCovered && (
+					<img
+						src="/images/cardpack.png"
+						alt="Card Pack"
+						className={styles.packCovered}
+					/>
+				)}
+
+				{showCard && packCovered && lastMintedCard && (
+					<CardItem
+						name={lastMintedCard.name}
+						image={lastMintedCard.image}
+						rarity={lastMintedCard.rarity}
+					/>
+				)}
+
+				{packCovered && (
+					<div className={styles.buttonGroupRight}>
+						<button
+							className={styles.actionButton}
+							onClick={() => {
+								setShowCard(false);
+								setPackCovered(false);
+								setLastMintedCard(null);
+								setShowModal(true);
+							}}
+						>
+							개봉하기
+						</button>
+
+						<button className={styles.actionButton} onClick={onBack}>
+							뒤로가기
+						</button>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

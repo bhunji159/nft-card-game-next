@@ -49,6 +49,7 @@
 	flex: 1;
 	max-width: 180px;
 	box-shadow: 0 4px 8px rgba(39, 174, 96, 0.4);
+	max-height: 50px;
 }
 
 .actionButton:hover {
@@ -61,4 +62,82 @@
 	font-size: 20px;
 	color: #7f8c8d;
 	font-family: "Noto Sans KR", sans-serif;
+}
+.cardFlying {
+	width: 150px;
+	height: 220px;
+	animation: flyUp 1s forwards;
+	position: relative;
+	z-index: 10;
+}
+
+@keyframes flyUp {
+	0% {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.packCovered {
+	width: 200px;
+	height: 300px;
+	position: absolute;
+	top: 50px; /* 카드 위치에 맞게 조절 */
+	left: 50%;
+	transform: translateX(-50%);
+	animation: packCoverFade 0.7s forwards;
+	z-index: 20;
+}
+
+@keyframes packCoverFade {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+.backButtonWrapper {
+	margin-top: 30px;
+	display: flex;
+	justify-content: center;
+}
+
+.backButton {
+	background-color: #ccc;
+	border: none;
+	padding: 12px 28px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 16px;
+	color: #333;
+	transition: background-color 0.3s ease;
+}
+
+.backButton:hover {
+	background-color: #aaa;
+}
+.cardAndButtons {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 24px; /* 카드와 버튼 사이 간격 */
+	margin-top: 20px;
+}
+
+/* 오른쪽 버튼 그룹을 세로로 정렬하거나 가로로 정렬 가능 */
+.buttonGroupRight {
+	display: flex;
+	flex-direction: column; /* 세로 정렬 */
+	gap: 12px;
+	min-width: 140px;
+}
+.myBox {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
