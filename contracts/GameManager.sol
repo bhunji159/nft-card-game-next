@@ -156,8 +156,10 @@ contract GameManager {
         require(seller != address(0), "Invalid token");
         require(seller != msg.sender, "You already own this");
 
+        bool isOnSale = uniqueNFT.getIsOnSale(tokenId);
+        require(isOnSale, "Not for Sale");
+
         uint256 price = uniqueNFT.getPrice(tokenId);
-        require(price > 0, "Not for sale");
         require(msg.value >= price, "Insufficient payment");
 
         // 소유권 이전
@@ -181,8 +183,10 @@ contract GameManager {
         require(seller != address(0), "Invalid seller");
         require(seller != msg.sender, "You already own this");
 
+        bool isOnSale = multiNFT.getIsOnSale(seller, typeId);
+        require(isOnSale, "Not for sale");
+
         uint256 pricePerUnit = multiNFT.getPrice(seller, typeId);
-        require(pricePerUnit > 0, "Not for sale");
         uint256 totalPrice = pricePerUnit * amount;
         require(msg.value >= totalPrice, "Insufficient payment");
 
