@@ -2,5 +2,8 @@
   "name": "1.json",
   "description": "꼬부기",
   "image": "https://ipfs.io/ipfs/QmRvzEqNPuhD9o44ti36kieJ7hvzpWKhtWgu9GQiffNDut",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    }]
 }

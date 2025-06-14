@@ -2,5 +2,8 @@
   "name": "2.json",
   "description": "라플라스",
   "image": "https://ipfs.io/ipfs/QmYkjdnNgD98ihP1J34HCuWs1DfQhiABdcCgXp8M9cv9fx",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Unique"
+    }]
 }

@@ -2,5 +2,8 @@
   "name": "8.json",
   "description": "파이리",
   "image": "https://ipfs.io/ipfs/QmT2i1bk3QJsA7LQgXXZvMZLrvoMW2YWRhSdgEmPZRe5D1",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }]
 }

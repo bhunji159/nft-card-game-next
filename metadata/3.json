@@ -2,5 +2,8 @@
   "name": "3.json",
   "description": "버터플",
   "image": "https://ipfs.io/ipfs/QmVHYaJDxrcTcFkzUCUCqvoHp5HF3Fc8MBuC9EpBKbmSwK",
-  "attributes": []
+  "attributes": [ {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    }]
 }
