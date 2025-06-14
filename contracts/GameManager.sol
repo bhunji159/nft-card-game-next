@@ -241,6 +241,8 @@ contract GameManager {
                 index++;
             }
         }
+
+        return (ids, prices, uris);
     }
 
     // 판매 중인 MultiCard 목록 조회
@@ -282,6 +284,8 @@ contract GameManager {
                 }
             }
         }
+
+        return (sellers, typeIds, prices, uris);
     }
 
     // NFT 컨트랙트 주소 변경
@@ -317,6 +321,8 @@ contract GameManager {
                 index++;
             }
         }
+
+        return (ids, uris);
     }
 
     // 유저가 가진 Multi 카드 전체 조회
@@ -332,5 +338,7 @@ contract GameManager {
             balances[i] = multiNFT.balanceOf(user, id);
             uris[i] = multiCardURIs[id];
         }
+
+        return (typeIds, balances, uris);
     }
 }
