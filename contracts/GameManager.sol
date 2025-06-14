@@ -26,15 +26,6 @@ contract GameManager {
     uint256[] public multiCardIds;
     mapping(uint256 => string) public multiCardURIs;
 
-    // UniqueCard 판매 정보
-    mapping(uint256 => address) public uniqueCardSeller; // tokenId -> seller (주소)
-    mapping(uint256 => uint256) public uniqueCardPrice;
-    mapping(uint256 => bool) public uniqueCardOnSale;
-
-    // MultiCard 판매 정보
-    mapping(address => mapping(uint256 => uint256)) public multiCardPrices; // seller -> typeId -> 가격
-    mapping(address => mapping(uint256 => bool)) public multiCardOnSale;
-
     constructor(address _uniqueNFT, address _multiNFT, uint256 _cardPackPrice) {
         uniqueNFT = UniqueCardNFT(_uniqueNFT);
         multiNFT = MultiCardItems(_multiNFT);
