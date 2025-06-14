@@ -1,6 +1,8 @@
 import { ethers } from "hardhat";
 
 async function main() {
+	const [deployer] = await ethers.getSigners();
+
 	// 1) UniqueCardNFT 배포
 	const UniqueCardNFT = await ethers.getContractFactory("UniqueCardNFT");
 	const uniqueNFT = await UniqueCardNFT.deploy();
@@ -27,21 +29,21 @@ async function main() {
 	await gameManager.deployed();
 	console.log("GameManager deployed to:", gameManager.address);
 
-	const tx1 = await multiNFT.transferOwnership(gameManager.address);
+	let tx1 = await uniqueNFT.setGameManager(gameManager.address);
 	await tx1.wait();
+	console.log("Set GameManager in UniqueCardNFT");
+
+	let tx2 = await multiNFT.setGameManager(gameManager.address);
+    await tx2.wait();
+    console.log("Set GameManager in MultiCardItems");
+
+	const tx3 = await multiNFT.transferOwnership(gameManager.address);
+	await tx3.wait();
 	console.log("MultiCardItems ownership transferred to GameManager");
 
-	const tx2 = await uniqueNFT.transferOwnership(gameManager.address);
-	await tx2.wait();
+	const tx4 = await uniqueNFT.transferOwnership(gameManager.address);
+	await tx4.wait();
 	console.log("UniqueCardNFT ownership transferred to GameManager");
-
-	let tx3 = await uniqueNFT.setGameManager(gameManager.address);
-    await tx3.wait();
-    console.log("Set GameManager in UniqueCardNFT");
-
-    let tx4 = await multiNFT.setGameManager(gameManager.address);
-    await tx4.wait();
-    console.log("Set GameManager in MultiCardItems");
 }
 
 main()
