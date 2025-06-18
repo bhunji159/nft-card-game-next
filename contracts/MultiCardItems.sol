@@ -57,16 +57,16 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
         // SellersByTypeId에 추가
         bool alreadyListed = false;
         for (uint i = 0; i < sellersByTypeId[typeId].length; i++) {
-            if (sellersByTypeId[typeId][i] == msg.sender) {
+            if (sellersByTypeId[typeId][i] == user) {
                 alreadyListed = true;
                 break;
             }
         }
         if (!alreadyListed) {
-            sellersByTypeId[typeId].push(msg.sender);
+            sellersByTypeId[typeId].push(user);
         }
 
-        emit PriceSet(msg.sender, typeId, priceWei);
+        emit PriceSet(user, typeId, priceWei);
     }
 
     // 가격 조회
@@ -119,23 +119,23 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     }
 
     // 판매 취소
-    function cancelSale(uint256 typeId) external {
-        require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
-        require(isOnSale[msg.sender][typeId], "Not on sale");
-        prices[msg.sender][typeId] = 0;
-        isOnSale[msg.sender][typeId] = false;
+    function cancelSaleFrom(address user, uint256 typeId) external {
+        require(balanceOf(user, typeId) > 0, "You don't own this type");
+        require(isOnSale[user][typeId], "Not on sale");
+        prices[user][typeId] = 0;
+        isOnSale[user][typeId] = false;
 
         // SellersByTypeId에서 제거
         address[] storage sellers = sellersByTypeId[typeId];
         for (uint i = 0; i < sellers.length; i++) {
-            if (sellers[i] == msg.sender) {
+            if (sellers[i] == user) {
                 sellers[i] = sellers[sellers.length - 1]; // 마지막 요소와 스왑
                 sellers.pop();                            // 제거
                 break;
             }
         }
 
-        emit SaleCancelled(msg.sender, typeId);
+        emit SaleCancelled(user, typeId);
     }
 
     function getIsOnSale(address seller, uint256 typeId) external view returns (bool) {

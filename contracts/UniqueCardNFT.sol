@@ -35,12 +35,12 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     }
 
     // 가격 설정
-    function setPrice(uint256 tokenId, uint256 price) external {
-        require(ownerOf(tokenId) == msg.sender, "Not the owner");
+    function setPriceFrom(address user, uint256 tokenId, uint256 price) external {
+        require(ownerOf(tokenId) == user, "Not the owner");
         tokenPrices[tokenId] = price;
         isOnSale[tokenId] = true;
 
-        emit PriceSet(msg.sender, tokenId, price);
+        emit PriceSet(user, tokenId, price);
     }
 
     // 거래
@@ -75,12 +75,12 @@ contract UniqueCardNFT is ERC721URIStorage, Ownable {
     }
 
     // 판매 취소
-    function cancelSale(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "Not token owner");
+    function cancelSaleFrom(address user, uint256 tokenId) external {
+        require(ownerOf(tokenId) == user, "Not token owner");
         tokenPrices[tokenId] = 0;
         isOnSale[tokenId] = false;
 
-        emit SaleCanceled(msg.sender, tokenId);
+        emit SaleCanceled(user, tokenId);
     }
 
     function getIsOnSale(uint256 tokenId) external view returns (bool) {

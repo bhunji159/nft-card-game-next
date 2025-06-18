@@ -128,7 +128,7 @@ contract GameManager {
     // 유니크 카드 판대 등록
     function setUniqueCardForSale(uint256 tokenId, uint256 price) external {
         require(uniqueNFT.ownerOf(tokenId) == msg.sender, "Not token owner");
-        uniqueNFT.setPrice(tokenId, price);
+        uniqueNFT.setPriceFrom(msg.sender, tokenId, price);
     }
 
     // 멀티 카드 판매 등록
@@ -141,13 +141,13 @@ multiNFT.setPriceFrom(msg.sender, typeId, price, amount);
     // 유니크 카드 판매 취소
     function cancelUniqueCardForSale(uint256 tokenId) external {
         require(uniqueNFT.ownerOf(tokenId) == msg.sender, "Not token owner");
-        uniqueNFT.cancelSale(tokenId);
+        uniqueNFT.cancelSaleFrom(msg.sender, tokenId);
     }
 
     // 멀티 카드 판매 취소
     function cancelMultiCardForSale(uint256 typeId) external {
         require(multiNFT.balanceOf(msg.sender, typeId) > 0, "Not token owner");
-        multiNFT.cancelSale(typeId);
+        multiNFT.cancelSaleFrom(msg.sender, typeId);
     }
 
     // 유니크 카드 구매
