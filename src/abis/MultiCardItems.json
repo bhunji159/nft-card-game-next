@@ -433,12 +433,17 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
 				"name": "typeId",
 				"type": "uint256"
 			}
 		],
-		"name": "cancelSale",
+		"name": "cancelSaleFrom",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -860,6 +865,11 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
 				"name": "typeId",
 				"type": "uint256"
@@ -875,7 +885,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "setPrice",
+		"name": "setPriceFrom",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

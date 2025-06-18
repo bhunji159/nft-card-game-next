@@ -87,6 +87,13 @@ export default function MarketPage() {
 					console.log("✅ GameManager에 대한 승인 완료");
 				}
 
+				// ✅ 판매 상태 등록은 GameManager가 대신 처리함
+				const amount = 1;
+				await contract.methods
+					.setMultiCardForSale(tokenId, priceInWei, amount)
+					.send({ from: walletAddress });
+
+				console.log("✅ GameManager를 통한 판매 등록 완료");
 				const balance = await multiNFT.methods
 					.balanceOf(walletAddress, tokenId)
 					.call();
