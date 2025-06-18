@@ -8,8 +8,9 @@ import CardItem from "../components/CardItem";
 import Modal from "../components/Modal";
 import GameManagerABI from "../../abis/GameManager.json";
 import { addOwnedCard, FirebaseCardMeta } from "../../lib/firebaseUser";
+import { useRouter } from "next/navigation";
+import { useContract } from "../../../contracts/ContractContext";
 
-const GAME_MANAGER_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const CARD_PACK_PRICE_ETH = "1";
 
 interface CardMeta {
@@ -18,13 +19,15 @@ interface CardMeta {
 	rarity: string;
 }
 
-export default function OpenPackPage({ onBack }: { onBack: () => void }) {
+export default function OpenPackPage() {
+	const { gameManagerAddress } = useContract();
 	const { walletAddress } = useWallet();
 
 	const [coinBalance, setCoinBalance] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [txLoading, setTxLoading] = useState(false);
 	const [showModal, setShowModal] = useState(false);
+	const router = useRouter();
 
 	// 애니메이션 상태
 	const [showCard, setShowCard] = useState(false);
@@ -32,7 +35,9 @@ export default function OpenPackPage({ onBack }: { onBack: () => void }) {
 
 	// 마지막 발급 카드 정보
 	const [lastMintedCard, setLastMintedCard] = useState<CardMeta | null>(null);
-
+	const handleBack = () => {
+		router.back(); // 이전 페이지로 이동
+	};
 	useEffect(() => {
 		if (!walletAddress || !window.ethereum) return;
 
@@ -97,21 +102,24 @@ export default function OpenPackPage({ onBack }: { onBack: () => void }) {
 		const userAddress = await signer.getAddress();
 
 		const contract = new ethers.Contract(
-			GAME_MANAGER_ADDRESS,
+			gameManagerAddress,
 			GameManagerABI,
 			signer
 		);
 		const iface = new ethers.utils.Interface(GameManagerABI);
 		const priceWei = ethers.utils.parseEther(CARD_PACK_PRICE_ETH);
 
-		const tx = await contract.openCardPack({ value: priceWei });
+		const tx = await contract.openCardPack({
+			value: priceWei,
+			gasLimit: 300000,
+		});
 		const receipt = await tx.wait();
 
 		let mintedCardUri: string | null = null;
 		let mintedTokenId: number | string | null = null;
 
 		for (const log of receipt.logs) {
-			if (log.address.toLowerCase() !== GAME_MANAGER_ADDRESS.toLowerCase())
+			if (log.address.toLowerCase() !== gameManagerAddress.toLowerCase())
 				continue;
 
 			try {
@@ -140,12 +148,14 @@ export default function OpenPackPage({ onBack }: { onBack: () => void }) {
 			setPackCovered(false);
 
 			if (walletAddress) {
-				// Firebase 저장용 객체 생성
+				// Firebase 저장용 객체 생성, onMarket은 새 카드면 0으로 초기화
 				const firebaseCardMeta: FirebaseCardMeta = {
 					tokenId: mintedTokenId,
 					uri: mintedCardUri,
 					rarity: cardMeta.rarity,
 					name: cardMeta.name,
+					balance: 1,
+					onMarket: 0,
 				};
 				await addOwnedCard(walletAddress, firebaseCardMeta);
 			}
@@ -174,90 +184,94 @@ export default function OpenPackPage({ onBack }: { onBack: () => void }) {
 	};
 
 	return (
-		<div className={styles.container}>
-			<h2 className={styles.title}>카드팩 개봉 페이지</h2>
-			<div className={styles.infoBox}>
-				<p>
-					카드팩 가격:{" "}
-					<span className={styles.highlight}>{CARD_PACK_PRICE_ETH} 코인</span>
-				</p>
-				<p>
-					보유 코인:{" "}
-					<span className={styles.highlight}>{coinBalance ?? "조회 실패"}</span>{" "}
-					ETH
-				</p>
-			</div>
-
-			{txLoading && <p className={styles.message}>거래 처리 중...</p>}
-
-			{!showCard && !txLoading && (
-				<div className={styles.buttonGroup}>
-					<button
-						className={styles.actionButton}
-						onClick={() => setShowModal(true)}
-					>
-						카드팩 구매하기
-					</button>
-					<button className={styles.backButton} onClick={onBack}>
-						뒤로가기
-					</button>
+		<div className={styles.flexContainer}>
+			<div className={styles.container}>
+				<h2 className={styles.title}>카드팩 개봉 페이지</h2>
+				<div className={styles.infoBox}>
+					<p>
+						카드팩 가격:{" "}
+						<span className={styles.highlight}>{CARD_PACK_PRICE_ETH} 코인</span>
+					</p>
+					<p>
+						보유 코인:{" "}
+						<span className={styles.highlight}>
+							{coinBalance ?? "조회 실패"}
+						</span>{" "}
+						ETH
+					</p>
 				</div>
-			)}
 
-			{showModal && (
-				<Modal
-					message={`카드팩 가격은 ${CARD_PACK_PRICE_ETH} 코인입니다. 구매하시겠습니까?`}
-					onCancel={handleCancel}
-					onConfirm={handleConfirm}
-				/>
-			)}
+				{txLoading && <p className={styles.message}>거래 처리 중...</p>}
 
-			<div className={styles.myBox}>
-				{showCard && lastMintedCard && !packCovered && (
-					<CardItem
-						name={lastMintedCard.name}
-						image={lastMintedCard.image}
-						rarity={lastMintedCard.rarity}
-						className={styles.cardFlying}
-						onAnimationEnd={handleCardAnimationEnd}
-					/>
-				)}
-
-				{!showCard && packCovered && (
-					<img
-						src="/images/cardpack.png"
-						alt="Card Pack"
-						className={styles.packCovered}
-					/>
-				)}
-
-				{showCard && packCovered && lastMintedCard && (
-					<CardItem
-						name={lastMintedCard.name}
-						image={lastMintedCard.image}
-						rarity={lastMintedCard.rarity}
-					/>
-				)}
-
-				{packCovered && (
-					<div className={styles.buttonGroupRight}>
+				{!showCard && !txLoading && (
+					<div className={styles.buttonGroup}>
 						<button
 							className={styles.actionButton}
-							onClick={() => {
-								setShowCard(false);
-								setPackCovered(false);
-								setLastMintedCard(null);
-								setShowModal(true);
-							}}
+							onClick={() => setShowModal(true)}
 						>
-							개봉하기
+							카드팩 구매하기
 						</button>
-
-						<button className={styles.actionButton} onClick={onBack}>
+						<button className={styles.backButton} onClick={handleBack}>
 							뒤로가기
 						</button>
 					</div>
 				)}
+
+				{showModal && (
+					<Modal
+						message={`카드팩 가격은 ${CARD_PACK_PRICE_ETH} 코인입니다. 구매하시겠습니까?`}
+						onCancel={handleCancel}
+						onConfirm={handleConfirm}
+					/>
+				)}
+
+				<div className={styles.myBox}>
+					{showCard && lastMintedCard && !packCovered && (
+						<CardItem
+							name={lastMintedCard.name}
+							image={lastMintedCard.image}
+							rarity={lastMintedCard.rarity}
+							className={styles.cardFlying}
+							onAnimationEnd={handleCardAnimationEnd}
+						/>
+					)}
+
+					{!showCard && packCovered && (
+						<img
+							src="/images/cardpack.png"
+							alt="Card Pack"
+							className={styles.packCovered}
+						/>
+					)}
+
+					{showCard && packCovered && lastMintedCard && (
+						<CardItem
+							name={lastMintedCard.name}
+							image={lastMintedCard.image}
+							rarity={lastMintedCard.rarity}
+						/>
+					)}
+
+					{packCovered && (
+						<div className={styles.buttonGroupRight}>
+							<button
+								className={styles.actionButton}
+								onClick={() => {
+									setShowCard(false);
+									setPackCovered(false);
+									setLastMintedCard(null);
+									setShowModal(true);
+								}}
+							>
+								개봉하기
+							</button>
+
+							<button className={styles.actionButton} onClick={handleBack}>
+								뒤로가기
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

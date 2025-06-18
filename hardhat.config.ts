@@ -1,3 +1,4 @@
+require("ts-node/register");
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 

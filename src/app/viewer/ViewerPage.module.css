@@ -71,6 +71,7 @@
 	width: 90%;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 	text-align: center;
+	color: black;
 }
 
 .modalContent img {
@@ -91,4 +92,71 @@
 
 .modalContent button:hover {
 	background-color: #1e4fb5;
+}
+.container {
+	padding: 40px 20px; /* 위아래 패딩 넉넉히 */
+	text-align: center; /* 전체 가운데 정렬 */
+	max-width: 900px; /* 적당한 최대 너비 */
+	margin: 0 auto; /* 화면 가운데 배치 */
+}
+
+.title {
+	font-size: 32px; /* 크기 크게 */
+	font-weight: 700; /* 굵게 */
+	margin-bottom: 30px;
+}
+
+.filters {
+	display: flex;
+	justify-content: center; /* 가로 가운데 정렬 */
+	gap: 16px; /* 요소 사이 간격 */
+	margin-bottom: 40px; /* 필터와 카드리스트 간 간격 */
+	flex-wrap: wrap; /* 좁은 화면에서는 줄 바꿈 */
+}
+
+.filters input,
+.filters select {
+	padding: 10px 14px;
+	font-size: 16px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	min-width: 150px;
+	box-sizing: border-box;
+}
+
+/* 카드 리스트 영역 */
+.cardList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	justify-content: center; /* 카드들도 가운데 정렬 */
+}
+
+/* 모달 텍스트 크기 및 여백도 살짝 개선 */
+.modalContent h3 {
+	font-size: 28px;
+	font-weight: 700;
+	margin-bottom: 16px;
+}
+
+.modalContent p {
+	font-size: 16px;
+	margin: 6px 0;
+}
+.backButton {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	background-color: transparent;
+	border: none;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	color: #2d6cdf;
+	transition: color 0.2s ease;
+	z-index: 1100; /* 모달 위에도 잘 보이도록 */
+}
+
+.backButton:hover {
+	color: #1e4fb5;
 }

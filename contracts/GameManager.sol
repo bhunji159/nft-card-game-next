@@ -135,7 +135,7 @@ contract GameManager {
     function setMultiCardForSale(uint256 typeId, uint256 price, uint256 amount) external {
         //require(multiNFT.balanceOf(msg.sender, typeId) > 0, "You don't own this type");
         require(multiNFT.balanceOf(msg.sender, typeId) >= amount, "Not enough balance");
-        multiNFT.setPrice(typeId, price, amount);
+multiNFT.setPriceFrom(msg.sender, typeId, price, amount);
     }
 
     // 유니크 카드 판매 취소
@@ -202,7 +202,7 @@ contract GameManager {
         }
 
         // 판매 상태 초기화
-        multiNFT.finalizeSale(seller, typeId);
+        multiNFT.finalizeSale(seller, typeId,amount);
 
         emit MultiCardPurchased(msg.sender, typeId, multiCardURIs[typeId]);
     }

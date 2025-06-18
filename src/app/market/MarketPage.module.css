@@ -123,6 +123,7 @@
 	flex-direction: column;
 	align-items: stretch;
 	text-align: center;
+	color: black;
 }
 
 .modal-content button {
@@ -224,4 +225,23 @@
 	font-weight: bold;
 	align-self: center;
 	margin-right: 8px;
+}
+.card-rarity.common {
+	color: #555555; /* 진한회색 */
+}
+
+.card-rarity.uncommon {
+	color: #0070f3; /* 파란색 */
+}
+
+.card-rarity.rare {
+	color: red; /* 주황색 */
+}
+
+.card-rarity.unique {
+	color: #8e44ad; /* 보라색 */
+}
+
+.card-rarity.legendary {
+	color: #ffcc00; /* 금색 */
 }

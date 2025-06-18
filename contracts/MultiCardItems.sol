@@ -46,11 +46,13 @@ contract MultiCardItems is ERC1155URIStorage, Ownable {
     }
 
     // 가격 설정
-    function setPrice(uint256 typeId, uint256 priceWei, uint256 amount) external {
-        require(balanceOf(msg.sender, typeId) > 0, "You don't own this type");
-        prices[msg.sender][typeId] = priceWei;
-        saleAmounts[msg.sender][typeId] = amount;
-        isOnSale[msg.sender][typeId] = true;
+ function setPriceFrom(address user, uint256 typeId, uint256 priceWei, uint256 amount) external {
+    require(balanceOf(user, typeId) > 0, "You don't own this type");
+    require(isApprovedForAll(user, msg.sender), "Not approved");
+
+    prices[user][typeId] = priceWei;
+    saleAmounts[user][typeId] = amount;
+    isOnSale[user][typeId] = true;
 
         // SellersByTypeId에 추가
         bool alreadyListed = false;

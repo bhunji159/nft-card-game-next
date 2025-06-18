@@ -7,6 +7,7 @@ import styles from "./Home.module.css";
 import OpenPackPage from "./open-pack/page";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { ContractProvider } from "../../contracts/ContractContext";
 
 export default function Home() {
 	const { walletAddress, connectWallet } = useWallet();
@@ -51,40 +52,34 @@ export default function Home() {
 		);
 	}
 
-	// 카드 개봉 페이지 보여주기
-	if (showOpenPack) {
-		return <OpenPackPage onBack={() => setShowOpenPack(false)} />;
-	}
-
 	// 지갑 연결 완료 시 기본 홈 화면
 	return (
-		<div className={styles["home-container"]}>
-			<h1 className={styles["home-title"]}>NFT 카드 게임</h1>
-			<p className={styles["home-description"]}>
-				카드 보기, 마켓, 카드깡 기능을 시작하세요.
-			</p>
-			<div className={styles["button-wrapper"]}>
-				<Link href="/viewer">
-					<button className={styles["navigate-button"]}>
-						카드 뷰어로 이동
-					</button>
-				</Link>
+		<ContractProvider>
+			<div className={styles["home-container"]}>
+				<h1 className={styles["home-title"]}>NFT 카드 게임</h1>
+				<p className={styles["home-description"]}>
+					카드 보기, 마켓, 카드깡 기능을 시작하세요.
+				</p>
+				<div className={styles["button-wrapper"]}>
+					<Link href="/viewer">
+						<button className={styles["navigate-button"]}>
+							카드 뷰어로 이동
+						</button>
+					</Link>
+				</div>
+				<div className={styles["button-wrapper"]}>
+					<Link href="/market">
+						<button className={styles["navigate-button"]}>
+							마켓 페이지로 이동
+						</button>
+					</Link>
+				</div>
+				<div className={styles["button-wrapper"]}>
+					<Link href="/open-pack">
+						<button className={styles["navigate-button"]}>카드 개봉하기</button>
+					</Link>
+				</div>
 			</div>
-			<div className={styles["button-wrapper"]}>
-				<Link href="/market">
-					<button className={styles["navigate-button"]}>
-						마켓 페이지로 이동
-					</button>
-				</Link>
-			</div>
-			<div className={styles["button-wrapper"]}>
-				<button
-					className={styles["navigate-button"]}
-					onClick={() => setShowOpenPack(true)}
-				>
-					카드 개봉하기
-				</button>
-			</div>
-		</div>
+		</ContractProvider>
 	);
 }
