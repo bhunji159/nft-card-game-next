@@ -75,3 +75,29 @@ export async function updateUserCardOnMarket(
 		console.error("Firebase: onMarket 업데이트 실패", error);
 	}
 }
+
+export async function updateUserCardBalance(
+	walletAddress: string,
+	tokenId: string,
+	delta: number // -1 형태로 사용
+) {
+	try {
+		const userRef = doc(db, "users", walletAddress);
+		const userSnap = await getDoc(userRef);
+		if (!userSnap.exists()) return;
+
+		const data = userSnap.data();
+		const ownedCards: FirebaseCardMeta[] = data.ownedCards || [];
+
+		const idx = ownedCards.findIndex((c) => c.tokenId === tokenId);
+		if (idx < 0) return;
+
+		ownedCards[idx].balance += delta;
+		if (ownedCards[idx].balance < 0) ownedCards[idx].balance = 0;
+
+		await updateDoc(userRef, { ownedCards });
+		console.log("Firebase: 카드 balance 업데이트 완료");
+	} catch (error) {
+		console.error("Firebase: 카드 balance 업데이트 실패", error);
+	}
+}
